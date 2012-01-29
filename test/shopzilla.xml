@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductResponse xmlns="http://www.shopzilla.com/services/catalog">
+    <Classification>
+        <relevancyScore>1000</relevancyScore>
+        <searchUrl>
+            http://www.bizrate.com/acer-aspire-laptops/index__rf--af1__af_assettype_id--10__af_creative_id--6__af_id--6866__af_placement_id--1.html
+        </searchUrl>
+    </Classification>
+    <Offers includedResults="3" totalResults="125">
+        <PriceSet>
+            <minPrice integral="5398">$53.98</minPrice>
+            <maxPrice integral="366899">$3,668.99</maxPrice>
+        </PriceSet>
+        <Offer productId="4003042957" merchantId="24106" categoryId="462" id="4009717441">
+            <title>Acer Aspire Ethos AS8951G-9630</title>
+            <description>Acer Aspire Ethos AS8951G-9630</description>
+            <manufacturer>Acer</manufacturer>
+            <url>
+                http://rd.bizrate.com/rd?t=http%3A%2F%2Flink.mercent.com%2Fredirect.ashx%3Fmr%3AmerchantID%3DMSFT%26mr%3AtrackingCode%3DBEA8C409-78FE-E011-B18D-001B21A69EB0%26mr%3AtargetUrl%3Dhttp%3A%2F%2Fwww.microsoftstore.com%2Fstore%2Fmsstore%2Fen_US%2Fpd%2FproductID.237488000%253fWT.mc_id%253dmercent&amp;mid=24106&amp;cat_id=462&amp;atom=10039&amp;prod_id=4003042957&amp;oid=4009717441&amp;pos=1&amp;b_id=18&amp;bid_type=0&amp;bamt=295d11ad54194830&amp;cobrand=1&amp;rf=af1&amp;af_assettype_id=10&amp;af_creative_id=6&amp;af_id=6866&amp;af_placement_id=1
+            </url>
+            <Images>
+                <Image xsize="60" ysize="60">http://image11.bizrate-images.com/resize?sq=60&amp;uid=4009717441&amp;mid=24106</Image>
+                <Image xsize="100" ysize="100">http://image11.bizrate-images.com/resize?sq=100&amp;uid=4009717441&amp;mid=24106</Image>
+                <Image xsize="160" ysize="160">http://image11.bizrate-images.com/resize?sq=160&amp;uid=4009717441&amp;mid=24106</Image>
+                <Image xsize="400" ysize="400">http://image11.bizrate-images.com/resize?sq=400&amp;uid=4009717441&amp;mid=24106</Image>
+            </Images>
+            <sku>CWF00490</sku>
+            <detailUrl>
+                http://www.bizrate.com/oid4009717441/index__rf--af1__af_assettype_id--10__af_creative_id--6__af_id--6866__af_placement_id--1.html
+            </detailUrl>
+            <price integral="144900">$1,449.00</price>
+            <originalPrice integral="144900">$1,449.00</originalPrice>
+            <markdownPercent>0.00</markdownPercent>
+            <bidded>true</bidded>
+            <merchantProductId>CWF00490</merchantProductId>
+            <merchantName>Microsoft</merchantName>
+            <MerchantCertification certified="false" level="NO_SURVERYS"/>
+            <merchantLogoUrl>http://img12.bizrate-images.com/merchant/little/24106.gif</merchantLogoUrl>
+            <condition>NEW</condition>
+            <stock>IN</stock>
+            <shipAmount integral="0">$0.00</shipAmount>
+            <shipType>CUSTOM</shipType>
+        </Offer>
+        <Offer productId="2350032694" merchantId="401" categoryId="462" id="4085638108">
+            <title>Acer Black 11.6&quot; Aspire TimelineX AS1830T-68U118 Laptop PC with Intel Core i7-680UM Processor
+                and Windows 7 Home Premium
+            </title>
+            <description>Acer 11.6&quot; Aspire TimelineX AS1830T-68U118 Laptop PC: Key Features and Benefits: Intel
+                Core i7-680UM processor 2.53GHz, 4MB L3 Cache 4GB DDR3 SDRAM system memory Gives you the power to handle
+                most power hungry applications and tons of multimedia work...
+            </description>
+            <manufacturer>Acer America</manufacturer>
+            <url>
+                http://rd.bizrate.com/rd?t=http%3A%2F%2Flinksynergy.walmart.com%2Flink%3Fid%3DhLUPakqa5g4%26offerid%3D245515.19472992%26type%3D15%26murl%3Dhttp%253A%252F%252Fwww.walmart.com%252Fip%252FAcer-Black-11.6-Aspire-TimelineX-AS1830T-68U118-Laptop-PC-with-Intel-Core-i7-680UM-Processor-and-Windows-7-Home-Premium%252F19472992%253Fsourceid%253D0100000012230215302434%26u1%3D462&amp;mid=401&amp;cat_id=462&amp;atom=10039&amp;prod_id=2350032694&amp;oid=4085638108&amp;pos=1&amp;b_id=18&amp;bid_type=0&amp;bamt=f6a916d748cdf64b&amp;cobrand=1&amp;rf=af1&amp;af_assettype_id=10&amp;af_creative_id=6&amp;af_id=6866&amp;af_placement_id=1
+            </url>
+            <Images>
+                <Image xsize="60" ysize="60">http://image10.bizrate-images.com/resize?sq=60&amp;uid=4085638108&amp;mid=401</Image>
+                <Image xsize="100" ysize="100">http://image10.bizrate-images.com/resize?sq=100&amp;uid=4085638108&amp;mid=401</Image>
+                <Image xsize="160" ysize="160">http://image10.bizrate-images.com/resize?sq=160&amp;uid=4085638108&amp;mid=401</Image>
+                <Image xsize="400" ysize="400">http://image10.bizrate-images.com/resize?sq=400&amp;uid=4085638108&amp;mid=401</Image>
+            </Images>
+            <sku>0088448302562</sku>
+            <detailUrl>
+                http://www.bizrate.com/oid4085638108/index__rf--af1__af_assettype_id--10__af_creative_id--6__af_id--6866__af_placement_id--1.html
+            </detailUrl>
+            <price integral="64898">$648.98</price>
+            <originalPrice integral="64898">$648.98</originalPrice>
+            <markdownPercent>0.00</markdownPercent>
+            <bidded>true</bidded>
+            <merchantProductId>19472992</merchantProductId>
+            <merchantName>Walmart.com</merchantName>
+            <MerchantRating value="8.20">
+                <Image xsize="34" ysize="34">http://img10.bizrate-images.com/site/smiley_good_34x34.gif</Image>
+            </MerchantRating>
+            <MerchantCertification certified="false" level="SILVERADO"/>
+            <merchantLogoUrl>http://img11.bizrate-images.com/merchant/little/401.gif</merchantLogoUrl>
+            <condition>NEW</condition>
+            <stock>IN</stock>
+            <shipAmount integral="0">$0.00</shipAmount>
+            <shipType>UNKNOWN</shipType>
+            <shipWeight>1000001.000</shipWeight>
+        </Offer>
+        <Offer productId="4019641784" merchantId="24328" categoryId="462" id="2700368508">
+            <title>HP TFT7600 G2 17.3&quot; widescreen TFT active matrix KVM console</title>
+            <description>HP TFT7600 G2 17.3' widescreen TFT active matrix KVM console</description>
+            <manufacturer>HP</manufacturer>
+            <url>
+                http://rd.bizrate.com/rd?t=http%3A%2F%2Fwww.infinity-micro.com%2FProdDisplay_inter.asp%3FCatID%3D253%26ProdID%3D975531%26ExportID%3D24&amp;mid=24328&amp;cat_id=462&amp;atom=10039&amp;prod_id=4019641784&amp;oid=2700368508&amp;pos=1&amp;b_id=18&amp;bid_type=0&amp;bamt=295d11ad54194830&amp;cobrand=1&amp;rf=af1&amp;af_assettype_id=10&amp;af_creative_id=6&amp;af_id=6866&amp;af_placement_id=1
+            </url>
+            <Images>
+                <Image xsize="60" ysize="60">http://image10.bizrate-images.com/resize?sq=60&amp;uid=2700368508&amp;mid=24328</Image>
+                <Image xsize="100" ysize="100">http://image10.bizrate-images.com/resize?sq=100&amp;uid=2700368508&amp;mid=24328</Image>
+                <Image xsize="160" ysize="160">http://image10.bizrate-images.com/resize?sq=160&amp;uid=2700368508&amp;mid=24328</Image>
+                <Image xsize="400" ysize="400">http://image10.bizrate-images.com/resize?sq=400&amp;uid=2700368508&amp;mid=24328</Image>
+            </Images>
+            <sku>AZ884A</sku>
+            <detailUrl>
+                http://www.bizrate.com/oid2700368508/index__rf--af1__af_assettype_id--10__af_creative_id--6__af_id--6866__af_placement_id--1.html
+            </detailUrl>
+            <price integral="86900">$869.00</price>
+            <originalPrice integral="86900">$869.00</originalPrice>
+            <markdownPercent>0.00</markdownPercent>
+            <bidded>true</bidded>
+            <merchantProductId>AZ884A</merchantProductId>
+            <merchantName>Infinity Micro</merchantName>
+            <MerchantCertification certified="false" level="NO_SURVERYS"/>
+            <merchantLogoUrl>http://img10.bizrate-images.com/merchant/little/24328.gif</merchantLogoUrl>
+            <condition>NEW</condition>
+            <stock>IN</stock>
+            <shipAmount integral="2000">$20.00</shipAmount>
+            <shipType>CUSTOM</shipType>
+            <shipWeight>15.000</shipWeight>
+        </Offer>
+    </Offers>
+</ProductResponse>

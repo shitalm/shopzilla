@@ -1,0 +1,4 @@
+Utility to convert shopzilla XML feed to csv format.
+Any element which contains "," or double quote(") will be quoted.
+A double quote is quoted by another double quote.
+We need to extract out inner image elements.
