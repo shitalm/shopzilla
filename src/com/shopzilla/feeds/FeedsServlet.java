@@ -1,5 +1,6 @@
 package com.shopzilla.feeds;
 
+import javax.servlet.ServletException;
 import java.io.IOException;
 
 /**
@@ -18,6 +19,11 @@ public class FeedsServlet extends javax.servlet.http.HttpServlet {
         String url = request.getParameter("url");
         ShopzillaFeedConvertor convertor = new ShopzillaFeedConvertor();
         response.setContentType("text/csv");
-        convertor.convert(url, response.getOutputStream());
+        try {
+            convertor.convert(url, response.getOutputStream());
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            throw new ServletException(e);
+        }
     }
 }

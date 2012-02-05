@@ -4,10 +4,7 @@ import org.testng.annotations.Test;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.StringTokenizer;
 
 import static org.testng.Assert.assertEquals;
@@ -22,6 +19,7 @@ import static org.testng.Assert.assertEquals;
 @Test
 public class ShopzillaFeedConvertorTest {
 
+    @Test(enabled = false)
     public void testConversion() throws IOException, SAXException, ParserConfigurationException {
         InputStream in = ClassLoader.getSystemResourceAsStream("shopzilla.xml");
         ShopzillaFeedConvertor convertor = new ShopzillaFeedConvertor();
@@ -55,6 +53,21 @@ public class ShopzillaFeedConvertorTest {
             if(i == 8) assertEquals(element, "http://image11.bizrate-images.com/resize?sq=60&uid=4009717441&mid=24106");
         }
         
+    }
+
+    public void URLTest() throws IOException {
+        OutputStream out = null;
+        ShopzillaFeedConvertor convertor = new ShopzillaFeedConvertor();
+        String url = "http://catalog.bizrate.com/services/catalog/v1/us/product?apiKey=bfc9253adedf4ad6880d24ee17eb59d6&publisherId=6866&&categoryId=10000000&keyword=&productId=&productIdType=&offersOnly=true&biddedOnly=true&start=0&results=100000&sort=relevancy_desc&imageOnly=true&format=xml";
+        try {
+            out = new FileOutputStream(new File("feed.csv"));
+            convertor.convert(url, out);
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } finally {
+            if(out != null) out.close();
+        }
+
     }
 
 }
