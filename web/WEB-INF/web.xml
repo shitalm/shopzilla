@@ -7,7 +7,7 @@
 
     <servlet>
         <servlet-name>shopzilla</servlet-name>
-        <servlet-class>com.yahoo.feeds.FeedsServlet</servlet-class>
+        <servlet-class>com.shopzilla.feeds.FeedsServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>shopzilla</servlet-name>

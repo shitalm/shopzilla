@@ -21,7 +21,7 @@ public class ShopzillaURL {
     private String fetchCount = "100000";
     private String format = "xml";
 
-    private HTTPParams params= new HTTPParams(host, null);
+    private HTTPParams params= new HTTPParams(host, "");
 
     String getCategoryQueryURL(String categoryId) {
         this.categoryId = categoryId;

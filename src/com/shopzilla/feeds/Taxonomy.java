@@ -16,6 +16,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 
 /**
@@ -26,6 +27,8 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class Taxonomy {
+
+    private static final Logger log = Logger.getLogger(Taxonomy.class.getName());
 
     List<Category> getStaticChildCategories(String categoryId) throws Exception {
         String url = "file://taxonomy.xml";
@@ -69,9 +72,9 @@ public class Taxonomy {
         Taxonomy taxonomy = new Taxonomy();
         //String url = "file://taxonomy.xml";
         String url = new ShopzillaURL().getCategoryQueryURL(categoryId);
-        System.out.println("URL=" + url);
+        System.err.println("URL=" + url);
         List<Category> list = taxonomy.getChildCategories(url, categoryId);
-        System.out.println(Arrays.toString(list.toArray()));
+        System.err.println(Arrays.toString(list.toArray()));
     }
 }
 

@@ -5,21 +5,27 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import javax.servlet.http.HttpUtils;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Converts Shopzilla XML feed to CSV format
  */
 public class ShopzillaFeedConvertor extends DefaultHandler {
+    private static final Logger log = Logger.getLogger(ShopzillaFeedConvertor.class.getName());
+
+    static {
+        //log.setLevel(Level.ALL);
+    }
+
+
     // getting SAXParserFactory instance
     private static SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
     private HashMap<String, String> offer = null;
@@ -30,7 +36,6 @@ public class ShopzillaFeedConvertor extends DefaultHandler {
                 curFetchCount = 0, maxFetchCount=100000,
                 includedResultsIteration = 0, 
                 fetchCountIteration = 0, totalResultsIteration = 1;
-;
 
 
     public void convert(String urlString, OutputStream out) throws Exception {
@@ -71,28 +76,32 @@ public class ShopzillaFeedConvertor extends DefaultHandler {
             maxFetchCount = requestedMaxFetchCount;
         }
         System.err.println("Will download " + maxFetchCount + " offers");
+        
         String categoryId = params.getAttributeValue("categoryId");
         if(categoryId == null || categoryId == "") {
             iterate(params, out);
             return;
         }
-        System.err.println("Need to fetch child categories");
-        List<Category> list = new Taxonomy().getStaticChildCategories(categoryId);
+        log.info("Need to fetch child categories");
+        //List<Category> list = new Taxonomy().getStaticChildCategories(categoryId);
+        List<Category> list = new Taxonomy().getChildCategories(categoryId);
+
         if(list.size() == 0) {
-            System.err.println(categoryId + " does not have child categories");
+            log.info(categoryId + " does not have child categories");
             list.add(new Category(categoryId));
         }
-        System.err.println("Will fetch offers for " + list.size() + " categories");
+        log.info("Will fetch offers for " + list.size() + " categories");
         for(Category category : list) {
+            if(curFetchCount >= maxFetchCount) break;
             params.setAttributeValue("categoryId", category.id);
-            System.out.println(params.getURL());
+            //log.info(params.getURL());
             iterate(params, out);
         }
 
     }
 
     private void iterate(HTTPParams params, OutputStream out) throws Exception {
-        //System.out.println("Query args:\n" + Utils.printQueryMap(queryMap));
+        //log.info("Query args:\n" + Utils.printQueryMap(queryMap));
         int iter = 0;
         fetchCountIteration = 0;
         totalResultsIteration = 1;
@@ -100,7 +109,7 @@ public class ShopzillaFeedConvertor extends DefaultHandler {
             index = fetchCountIteration;
             params.setAttributeValue("start", index + "");
             String newURLString = params.getURL();
-            System.err.println("new URL string=\n" + newURLString);
+            log.info("new URL string=\n" + newURLString);
             InputStream in = Utils.getInputStream(newURLString, true);
 
 //            InputStream in = null;
@@ -108,12 +117,12 @@ public class ShopzillaFeedConvertor extends DefaultHandler {
             if (in != null) in.close();
             fetchCountIteration += includedResultsIteration;
             curFetchCount += includedResultsIteration;
-            System.err.println("Iter = " + ++iter + " includedResultsIteration=" + includedResultsIteration
+            log.info("Iter = " + ++iter + " includedResultsIteration=" + includedResultsIteration
                     + " iterarion fetch count=" + fetchCountIteration + " current fetch count = " + curFetchCount);
 
             if(includedResultsIteration == 0) {
                 // there are no more records to fetch
-                System.err.println("No more items to fetch");
+                log.info("No more items to fetch");
                 break;
             }
             includedResultsIteration = 0; // reset for the next iteration
@@ -140,7 +149,7 @@ public class ShopzillaFeedConvertor extends DefaultHandler {
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-        //System.out.println("Start element =" + qName);
+        //log.info("Start element =" + qName);
         if (qName.equalsIgnoreCase("Offer")) {
             offer = new HashMap<String, String>();
             for (int i = 0; i < attributes.getLength(); i++) {
@@ -152,7 +161,7 @@ public class ShopzillaFeedConvertor extends DefaultHandler {
         } else if (qName.equalsIgnoreCase("Offers")) {
             totalResultsIteration = Utils.parseInt(attributes.getValue("totalResults"));
             includedResultsIteration = Utils.parseInt(attributes.getValue("includedResults"));
-            System.err.println("totalResultsIteration=" + totalResultsIteration + " includedResultsIteration=" + includedResultsIteration);
+            log.info("totalResultsIteration=" + totalResultsIteration + " includedResultsIteration=" + includedResultsIteration);
         }
 
         curValue = new StringBuffer(300);
@@ -161,7 +170,7 @@ public class ShopzillaFeedConvertor extends DefaultHandler {
 
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
-        //System.out.println("End element = "+ qName);
+        //log.info("End element = "+ qName);
         if (offer == null) return;  // Unless we are inside offer element we are not interested
         if (qName.equalsIgnoreCase("Images")) return;   // we don't have to process outer Images container
 
@@ -180,7 +189,7 @@ public class ShopzillaFeedConvertor extends DefaultHandler {
             if (!(xsize.equals("60") || xsize.equals("100") || xsize.equals("160") || xsize.equals("400")))
                 return;
             String elemName = "image-" + xsize + "x" + ysize;
-            //System.out.println("Putting " + elemName + "=" + curValue + " in offer");
+            //log.info("Putting " + elemName + "=" + curValue + " in offer");
 
             offer.put(elemName, curValue.toString());
             xsize = null;
@@ -189,7 +198,7 @@ public class ShopzillaFeedConvertor extends DefaultHandler {
         }
 
         // we have a new element (other than image) value for offer
-        //System.out.println("Putting " + qName.toLowerCase() + "=" + curValue + " in offer");
+        //log.info("Putting " + qName.toLowerCase() + "=" + curValue + " in offer");
         offer.put(qName.toLowerCase(), curValue.toString());
 
     }
@@ -271,13 +280,13 @@ public class ShopzillaFeedConvertor extends DefaultHandler {
     public void characters(char[] chars, int start, int length) throws SAXException {
         if (offer == null) return;  // Unless we are inside offer element we are not interested
         curValue.append(chars, start, length);
-        //System.out.println("Start=" + start + " length = "+ length + " value=" + curValue);
+        //log.info("Start=" + start + " length = "+ length + " value=" + curValue);
     }
 
     public static void main(String[] args) throws Exception {
         //FileReader reader = new FileReader("/Users/shitalm/Documents/work/test/feeds/test/shopzilla.xml");
         ShopzillaFeedConvertor convertor = new ShopzillaFeedConvertor();
-        //convertor.convert("file://Users/shitalm/Documents/work/test/feeds/resources/shopzilla.xml", System.out);
+        //convertor.convert("file://Users/shitalm/Documents/work/test/feeds/resources/shopzilla.xml", log.info);
         //String url = "http://catalog.bizrate.com/services/catalog/v1/us/product?apiKey=bfc9253adedf4ad6880d24ee17eb59d6&publisherId=6866&placementId=1&categoryId=&keyword=acer+aspire+laptops&productId=&productIdType=&offersOnly=true&merchantId=&brandId=&biddedOnly=true&minPrice=&maxPrice=&minMarkdown=&zipCode=&freeShipping=&start=0&results=3&backfillResults=0&startOffers=0&resultsOffers=0&sort=relevancy_desc&attFilter=&attWeights=&attributeId=&resultsAttribute=1&resultsAttributeValues=1&showAttributes=&showProductAttributes=&minRelevancyScore=100&maxAge=&showRawUrl=&imageOnly=true&format=xml&callback=callback";
         String url = "http://catalog.bizrate.com/services/catalog/v1/us/product?apiKey=bfc9253adedf4ad6880d24ee17eb59d6&publisherId=6866&&categoryId=&keyword=laptop&productId=&productIdType=&offersOnly=true&biddedOnly=true&start=0&results=30000&sort=relevancy_desc&minRelevancyScore=100&imageOnly=true&format=xml";
         convertor.convert(url, System.out);

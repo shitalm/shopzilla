@@ -20,13 +20,13 @@ import static org.testng.Assert.assertEquals;
 public class ShopzillaFeedConvertorTest {
 
     @Test(enabled = false)
-    public void testConversion() throws IOException, SAXException, ParserConfigurationException {
-        InputStream in = ClassLoader.getSystemResourceAsStream("shopzilla.xml");
+    public void testConversion() throws Exception {
+//        InputStream in = ClassLoader.getSystemResourceAsStream("shopzilla.xml");
         ShopzillaFeedConvertor convertor = new ShopzillaFeedConvertor();
         StringBuffer buffer = new StringBuffer(10000);
         OutputStream out =  new ByteArrayOutputStream(10000);
 
-        convertor.convertXMLToCSV(in, out);
+        convertor.convert("file://shopzilla.xml", out);
         String output = out.toString();
         StringTokenizer tokenizer = new StringTokenizer(output, "\r\n");
         assertEquals(tokenizer.countTokens(), 4);   // header and 3 offers
@@ -55,10 +55,13 @@ public class ShopzillaFeedConvertorTest {
         
     }
 
+    @Test (enabled = true)
     public void URLTest() throws IOException {
         OutputStream out = null;
         ShopzillaFeedConvertor convertor = new ShopzillaFeedConvertor();
-        String url = "http://catalog.bizrate.com/services/catalog/v1/us/product?apiKey=bfc9253adedf4ad6880d24ee17eb59d6&publisherId=6866&&categoryId=10000000&keyword=&productId=&productIdType=&offersOnly=true&biddedOnly=true&start=0&results=100000&sort=relevancy_desc&imageOnly=true&format=xml";
+        //String url = "http://catalog.bizrate.com/services/catalog/v1/us/product?apiKey=bfc9253adedf4ad6880d24ee17eb59d6&publisherId=6866&&categoryId=10000000&keyword=&productId=&productIdType=&offersOnly=true&biddedOnly=true&start=0&results=100000&sort=relevancy_desc&imageOnly=true&format=xml";
+
+        String url = "file://shopzilla.xml";
         try {
             out = new FileOutputStream(new File("feed.csv"));
             convertor.convert(url, out);
