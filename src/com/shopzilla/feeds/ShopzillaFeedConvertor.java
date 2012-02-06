@@ -12,7 +12,7 @@ import java.io.*;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
+import java.util.SortedSet;
 import java.util.logging.Logger;
 
 /**
@@ -21,11 +21,6 @@ import java.util.logging.Logger;
 public class ShopzillaFeedConvertor extends DefaultHandler {
     private static final Logger log = Logger.getLogger(ShopzillaFeedConvertor.class.getName());
 
-    static {
-        //log.setLevel(Level.ALL);
-    }
-
-
     // getting SAXParserFactory instance
     private static SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
     private HashMap<String, String> offer = null;
@@ -33,9 +28,12 @@ public class ShopzillaFeedConvertor extends DefaultHandler {
     private String xsize = null, ysize = null;
     private PrintWriter writer = null;
     private int index = 0,
-                curFetchCount = 0, maxFetchCount=100000,
-                includedResultsIteration = 0, 
-                fetchCountIteration = 0, totalResultsIteration = 1;
+            curFetchCount = 0, maxFetchCount = 100000,
+            includedResultsIteration = 0,
+            fetchCountIteration = 0, totalResultsIteration = 1;
+    SortedSet<OfferField> mandatoryFields = OfferField.getfields().headSet(OfferField.ProductId);
+    SortedSet<OfferField> otherFields = OfferField.getfields().tailSet(OfferField.ProductId);
+
 
 
     public void convert(String urlString, OutputStream out) throws Exception {
@@ -72,13 +70,13 @@ public class ShopzillaFeedConvertor extends DefaultHandler {
         HTTPParams params = new HTTPParams(urlString);
 
         int requestedMaxFetchCount = params.getAttributeValueAsInt("results");
-        if(requestedMaxFetchCount != 0) {
+        if (requestedMaxFetchCount != 0) {
             maxFetchCount = requestedMaxFetchCount;
         }
         System.err.println("Will download " + maxFetchCount + " offers");
-        
+
         String categoryId = params.getAttributeValue("categoryId");
-        if(categoryId == null || categoryId == "") {
+        if (categoryId == null || categoryId == "") {
             iterate(params, out);
             return;
         }
@@ -86,13 +84,13 @@ public class ShopzillaFeedConvertor extends DefaultHandler {
         //List<Category> list = new Taxonomy().getStaticChildCategories(categoryId);
         List<Category> list = new Taxonomy().getChildCategories(categoryId);
 
-        if(list.size() == 0) {
+        if (list.size() == 0) {
             log.info(categoryId + " does not have child categories");
             list.add(new Category(categoryId));
         }
         log.info("Will fetch offers for " + list.size() + " categories");
-        for(Category category : list) {
-            if(curFetchCount >= maxFetchCount) break;
+        for (Category category : list) {
+            if (curFetchCount >= maxFetchCount) break;
             params.setAttributeValue("categoryId", category.id);
             //log.info(params.getURL());
             iterate(params, out);
@@ -105,27 +103,34 @@ public class ShopzillaFeedConvertor extends DefaultHandler {
         int iter = 0;
         fetchCountIteration = 0;
         totalResultsIteration = 1;
-        while(fetchCountIteration < totalResultsIteration && curFetchCount < maxFetchCount) {
-            index = fetchCountIteration;
-            params.setAttributeValue("start", index + "");
-            String newURLString = params.getURL();
-            log.info("new URL string=\n" + newURLString);
-            InputStream in = Utils.getInputStream(newURLString, true);
+        int retryCount = 0;
+        while (fetchCountIteration < totalResultsIteration && curFetchCount < maxFetchCount && retryCount < 100) {
+            try {
+                index = fetchCountIteration;
+                params.setAttributeValue("start", index + "");
+                String newURLString = params.getURL();
+                log.info("new URL string=\n" + newURLString);
+                InputStream in = Utils.getInputStream(newURLString, true);
 
-//            InputStream in = null;
-            convertXMLToCSV(in, out);
-            if (in != null) in.close();
-            fetchCountIteration += includedResultsIteration;
-            curFetchCount += includedResultsIteration;
-            log.info("Iter = " + ++iter + " includedResultsIteration=" + includedResultsIteration
-                    + " iterarion fetch count=" + fetchCountIteration + " current fetch count = " + curFetchCount);
+                convertXMLToCSV(in, out);
+                if (in != null) in.close();
 
-            if(includedResultsIteration == 0) {
-                // there are no more records to fetch
-                log.info("No more items to fetch");
-                break;
+                fetchCountIteration += includedResultsIteration;
+                curFetchCount += includedResultsIteration;
+                log.info("Iter = " + ++iter + " includedResultsIteration=" + includedResultsIteration
+                        + " iterarion fetch count=" + fetchCountIteration + " current fetch count = " + curFetchCount);
+
+                if (includedResultsIteration == 0) {
+                    // there are no more records to fetch
+                    log.info("No more items to fetch");
+                    break;
+                }
+                includedResultsIteration = 0; // reset for the next iteration
+            } catch (Exception ex) {
+                log.warning(ex.getMessage() + "\n" + ex.getStackTrace());
+                retryCount++;
             }
-            includedResultsIteration = 0; // reset for the next iteration
+
 
         }
 
@@ -188,7 +193,7 @@ public class ShopzillaFeedConvertor extends DefaultHandler {
             // check whether its a supported size
             if (!(xsize.equals("60") || xsize.equals("100") || xsize.equals("160") || xsize.equals("400")))
                 return;
-            String elemName = "image-" + xsize + "x" + ysize;
+            String elemName = "image" + xsize + "x" + ysize;
             //log.info("Putting " + elemName + "=" + curValue + " in offer");
 
             offer.put(elemName, curValue.toString());
@@ -217,6 +222,7 @@ public class ShopzillaFeedConvertor extends DefaultHandler {
             value = value.trim();   // remove leading and trailing spaces as well
         }
         value = (value == null ? "" : value);
+        //System.out.println("Emitting value=" + value);
         writer.write(value);
         if (emitSeparator) writer.write(",");
     }
@@ -231,32 +237,16 @@ public class ShopzillaFeedConvertor extends DefaultHandler {
      */
 
     private void emitOffer(HashMap<String, String> offer) {
-        emitValue("productId");
-        emitValue("merchantId");
-        emitValue("categoryId");
-        emitValue("id");
-        emitValue("title");
-        emitValue("description");
-        emitValue("manufacturer");
-        emitValue("url");
-        emitValue("image-60x60");
-        emitValue("image-100x100");
-        emitValue("image-160x160");
-        emitValue("image-400x400");
-        emitValue("sku");
-        emitValue("detailURL");
-        emitValue("price");
-        emitValue("originalPrice");
-        emitValue("markedDownPercent");
-        emitValue("bidded");
-        emitValue("merchantProductId");
-        emitValue("merchantName");
-        emitValue("merchantLogoURL");
-        emitValue("condition");
-        emitValue("stock");
-        emitValue("shipAmount");
-        emitValue("shipType");
-        emitValue("shipWeight", false);
+        for(OfferField field : mandatoryFields) {
+            //System.out.println("Emitting value for " + field.getFieldName());
+            emitValue(field.getFieldName());
+        }
+        /*
+        for(OfferField field : otherFields) {
+            emitValue(field.getFieldName());
+        }
+        */
+
         writer.println();
 
     }
@@ -267,11 +257,17 @@ public class ShopzillaFeedConvertor extends DefaultHandler {
      */
 
     private void emitHeader() {
-        writer.print("productId,merchantId,categoryId,id,title,description,manufacturer,url,");
-        writer.print("image60x60,image100x100,image160x160,image400x400,");
-        writer.print("sku,detailURL,price,originalPrice,markedDownPercent,bidded,");
-        writer.print("merchantProductId,merchantName,merchantLogoURL,");
-        writer.print("condition,stock,shipAmount,shipType,shipWeight");
+        for(OfferField field : mandatoryFields) {
+            //System.out.println("Emitting header: " + field.getFieldName());
+            writer.print(field.getFieldName());
+            writer.print(",");
+        }
+        /*
+        for(OfferField field : otherFields) {
+            writer.print(field.getFieldName());
+        }
+        */
+
         writer.println();
 
     }
@@ -288,7 +284,7 @@ public class ShopzillaFeedConvertor extends DefaultHandler {
         ShopzillaFeedConvertor convertor = new ShopzillaFeedConvertor();
         //convertor.convert("file://Users/shitalm/Documents/work/test/feeds/resources/shopzilla.xml", log.info);
         //String url = "http://catalog.bizrate.com/services/catalog/v1/us/product?apiKey=bfc9253adedf4ad6880d24ee17eb59d6&publisherId=6866&placementId=1&categoryId=&keyword=acer+aspire+laptops&productId=&productIdType=&offersOnly=true&merchantId=&brandId=&biddedOnly=true&minPrice=&maxPrice=&minMarkdown=&zipCode=&freeShipping=&start=0&results=3&backfillResults=0&startOffers=0&resultsOffers=0&sort=relevancy_desc&attFilter=&attWeights=&attributeId=&resultsAttribute=1&resultsAttributeValues=1&showAttributes=&showProductAttributes=&minRelevancyScore=100&maxAge=&showRawUrl=&imageOnly=true&format=xml&callback=callback";
-        String url = "http://catalog.bizrate.com/services/catalog/v1/us/product?apiKey=bfc9253adedf4ad6880d24ee17eb59d6&publisherId=6866&&categoryId=&keyword=laptop&productId=&productIdType=&offersOnly=true&biddedOnly=true&start=0&results=30000&sort=relevancy_desc&minRelevancyScore=100&imageOnly=true&format=xml";
+        String url = "http://catalog.bizrate.com/services/catalog/v1/us/product?apiKey=bfc9253adedf4ad6880d24ee17eb59d6&publisherId=6866&&categoryId=&keyword=laptop&productId=&productIdType=&offersOnly=true&biddedOnly=true&start=0&results=300&sort=relevancy_desc&minRelevancyScore=100&imageOnly=true&format=xml";
         convertor.convert(url, System.out);
 
     }
