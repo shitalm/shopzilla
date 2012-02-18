@@ -10,13 +10,13 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public enum OfferField {
-    Title("title", true, 1),
-    Description("description", true, 2),
-    URL("url", true, 3),
-    Image60x60("image60x60", true, 4),
-    SKU("sku", true, 5),
-    Price("price", true, 6),
-    ProductId("productId", 7),
+    ProductId("productId", "id", true, 1),
+    Title("title", "name", true, 2),
+    Price("price", true, 3),
+    Description("description", "desc_short", true, 4),
+    URL("url", "URL", true, 5),
+    Image60x60("image60x60", "imageURL_small", true, 6),
+    SKU("sku", 7),
     MerchantId("merchantId", 8),
     CategoryId("categoryId", 9),
     Id("id", 10),
@@ -40,15 +40,25 @@ public enum OfferField {
 
 
 
-    private String fieldName;
+    private String nameInOffer, nameInProduct;
     private boolean mandatory;
     private int order;
+    private static Set<String> mandatoryFieldNamesInOffer = new HashSet<String>();
+    private static Set<String> mandatoryFieldNamesInProduct = new HashSet<String>();
+
     
     private static SortedSet<OfferField> fields = new TreeSet<OfferField>(new Comparator<OfferField>() {
         public int compare(OfferField offer1, OfferField offer2) {
             return offer1.order - offer2.order;
         }
     });
+
+    private static SortedSet<OfferField> mandatoryFields = new TreeSet<OfferField>(new Comparator<OfferField>() {
+        public int compare(OfferField offer1, OfferField offer2) {
+            return offer1.order - offer2.order;
+        }
+    });
+
 
     /** Add all offers to a sorted set
      * Order in which they are inserted below is not important as order is determined by the order
@@ -83,38 +93,61 @@ public enum OfferField {
         fields.add(ShipType);
         fields.add(ShipWeight);
 
+        for(OfferField field : fields) {
+            if(field.isMandatory()) {
+                mandatoryFields.add(field);
+                mandatoryFieldNamesInOffer.add(field.nameInOffer);
+                mandatoryFieldNamesInProduct.add(field.nameInProduct);
+            }
+
+        }
+
     }
 
     public static SortedSet<OfferField> getfields() {
         return fields;
     }
 
+    public static SortedSet<OfferField> getMandatoryFields() {
+        return mandatoryFields;
+    }
 
 
-    private OfferField(String fieldName, boolean mandatory, int order) {
-        this.fieldName = fieldName;
+    private OfferField(String nameInOffer, String nameInProduct, boolean mandatory, int order) {
+        this.nameInOffer = nameInOffer;
+        this.nameInProduct = nameInProduct;
         this.mandatory = mandatory;
         this.order = order;
 
     }
 
-    private OfferField(String fieldName, int order) {
-        this.fieldName = fieldName;
-        this.mandatory = false;
-        this.order = order;
+    private OfferField(String fieldName, boolean mandatory, int order) {
+        this(fieldName, fieldName, mandatory, order);
+    }
 
+    private OfferField(String fieldName, int order) {
+        this(fieldName, false, order);
     }
 
     public static void main(String[] args) {
         System.out.println(Arrays.toString(OfferField.getfields().toArray()));
     }
 
-    public String getFieldName() {
-        return fieldName;
+    public String getFieldName(ShopzillaFeedConvertor.OfferType offerType) {
+        if(offerType == ShopzillaFeedConvertor.OfferType.OFFER) return nameInOffer;
+        return nameInProduct;
     }
 
     public boolean isMandatory() {
         return mandatory;
+    }
+
+    public static boolean isMandatory(ShopzillaFeedConvertor.OfferType offerType, String name) {
+        if(offerType == ShopzillaFeedConvertor.OfferType.PRODUCT) {
+            return mandatoryFieldNamesInProduct.contains(name);
+        } else {
+            return mandatoryFieldNamesInOffer.contains(name);
+        }
     }
 
 

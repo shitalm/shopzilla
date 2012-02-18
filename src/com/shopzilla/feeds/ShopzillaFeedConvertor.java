@@ -31,9 +31,11 @@ public class ShopzillaFeedConvertor extends DefaultHandler {
             curFetchCount = 0, maxFetchCount = 100000,
             includedResultsIteration = 0,
             fetchCountIteration = 0, totalResultsIteration = 1;
-    SortedSet<OfferField> mandatoryFields = OfferField.getfields().headSet(OfferField.ProductId);
-    SortedSet<OfferField> otherFields = OfferField.getfields().tailSet(OfferField.ProductId);
 
+    enum OfferType {PRODUCT, OFFER}
+
+    ;
+    private OfferType offerType = OfferType.OFFER;
 
 
     public void convert(String urlString, OutputStream out) throws Exception {
@@ -155,9 +157,24 @@ public class ShopzillaFeedConvertor extends DefaultHandler {
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         //log.info("Start element =" + qName);
-        if (qName.equalsIgnoreCase("Offer")) {
+        if (qName.equalsIgnoreCase("Offer") || qName.equalsIgnoreCase("product")) {
             offer = new HashMap<String, String>();
+        }
+
+        if (qName.equalsIgnoreCase("Offer")) {
+            //System.out.println("Parsing Offer element");
+            this.offerType = ShopzillaFeedConvertor.OfferType.OFFER;
             for (int i = 0; i < attributes.getLength(); i++) {
+                offer.put(attributes.getQName(i).toLowerCase(), attributes.getValue(i));
+            }
+        } else if (qName.equalsIgnoreCase("product")) {
+            //System.out.println("Parsing product element");
+            this.offerType = OfferType.PRODUCT;
+        } else if (qName.equalsIgnoreCase("merchantProduct")) {
+            //System.out.println("Parsing merchantProduct element");
+            for (int i = 0; i < attributes.getLength(); i++) {
+//                System.out.println("Putting merchantProduct attribute: " +
+//                        attributes.getQName(i) + "=" + attributes.getValue(i) + " in offer");
                 offer.put(attributes.getQName(i).toLowerCase(), attributes.getValue(i));
             }
         } else if (qName.equalsIgnoreCase("Image")) {
@@ -179,12 +196,28 @@ public class ShopzillaFeedConvertor extends DefaultHandler {
         if (offer == null) return;  // Unless we are inside offer element we are not interested
         if (qName.equalsIgnoreCase("Images")) return;   // we don't have to process outer Images container
 
+        // override landing page url as this is to be constructed using an offline contract
+        if (qName.equalsIgnoreCase("Offer") || qName.equalsIgnoreCase("product")) {
+            String url = "http://www.bizrate.com/oid" +
+                    offer.get(OfferField.ProductId.getFieldName(offerType).toLowerCase()) +"/search/retarget/";
+            offer.put(OfferField.URL.getFieldName(offerType).toLowerCase(), url);
+        }
+
         if (qName.equalsIgnoreCase("Offer")) {
+            //System.out.println("End element = "+ qName);
             emitOffer(offer);
             offer = null;
             curValue = null;
             return;
         }
+        if (qName.equalsIgnoreCase("product")) {
+            //System.out.println("End element = "+ qName);
+            emitOffer(offer);
+            offer = null;
+            curValue = null;
+            return;
+        }
+
         if (curValue == null) return;
 
         if (qName.equalsIgnoreCase("Image")) {
@@ -203,8 +236,10 @@ public class ShopzillaFeedConvertor extends DefaultHandler {
         }
 
         // we have a new element (other than image) value for offer
-        //log.info("Putting " + qName.toLowerCase() + "=" + curValue + " in offer");
-        offer.put(qName.toLowerCase(), curValue.toString());
+        if (OfferField.isMandatory(offerType, qName)) {
+            log.info("Putting " + qName.toLowerCase() + "=" + curValue + " in offer. offertype = " + offerType);
+            offer.put(qName.toLowerCase(), curValue.toString());
+        }
 
     }
 
@@ -237,9 +272,9 @@ public class ShopzillaFeedConvertor extends DefaultHandler {
      */
 
     private void emitOffer(HashMap<String, String> offer) {
-        for(OfferField field : mandatoryFields) {
-            //System.out.println("Emitting value for " + field.getFieldName());
-            emitValue(field.getFieldName());
+        for (OfferField field : OfferField.getMandatoryFields()) {
+            //System.out.println("Emitting value for " + field.getFieldName(offerType));
+            emitValue(field.getFieldName(offerType));
         }
         /*
         for(OfferField field : otherFields) {
@@ -257,9 +292,9 @@ public class ShopzillaFeedConvertor extends DefaultHandler {
      */
 
     private void emitHeader() {
-        for(OfferField field : mandatoryFields) {
-            //System.out.println("Emitting header: " + field.getFieldName());
-            writer.print(field.getFieldName());
+        for (OfferField field : OfferField.getMandatoryFields()) {
+            //System.out.println("Emitting header: " + field.getFieldName(offerType));
+            writer.print(field.getFieldName(offerType));
             writer.print(",");
         }
         /*
@@ -284,8 +319,11 @@ public class ShopzillaFeedConvertor extends DefaultHandler {
         ShopzillaFeedConvertor convertor = new ShopzillaFeedConvertor();
         //convertor.convert("file://Users/shitalm/Documents/work/test/feeds/resources/shopzilla.xml", log.info);
         //String url = "http://catalog.bizrate.com/services/catalog/v1/us/product?apiKey=bfc9253adedf4ad6880d24ee17eb59d6&publisherId=6866&placementId=1&categoryId=&keyword=acer+aspire+laptops&productId=&productIdType=&offersOnly=true&merchantId=&brandId=&biddedOnly=true&minPrice=&maxPrice=&minMarkdown=&zipCode=&freeShipping=&start=0&results=3&backfillResults=0&startOffers=0&resultsOffers=0&sort=relevancy_desc&attFilter=&attWeights=&attributeId=&resultsAttribute=1&resultsAttributeValues=1&showAttributes=&showProductAttributes=&minRelevancyScore=100&maxAge=&showRawUrl=&imageOnly=true&format=xml&callback=callback";
-        String url = "http://catalog.bizrate.com/services/catalog/v1/us/product?apiKey=bfc9253adedf4ad6880d24ee17eb59d6&publisherId=6866&&categoryId=&keyword=laptop&productId=&productIdType=&offersOnly=true&biddedOnly=true&start=0&results=300&sort=relevancy_desc&minRelevancyScore=100&imageOnly=true&format=xml";
-        convertor.convert(url, System.out);
+        //String url = "http://catalog.bizrate.com/services/catalog/v1/us/product?apiKey=bfc9253adedf4ad6880d24ee17eb59d6&publisherId=6866&&categoryId=&keyword=laptop&productId=&productIdType=&offersOnly=true&biddedOnly=true&start=0&results=300&sort=relevancy_desc&minRelevancyScore=100&imageOnly=true&format=xml";
+        convertor.convert("file:///Users/shitalm/Documents/work/test/shopzilla/test/publisher_feed_100001846.xml", System.out);
+
+        //convertor.convert(url, System.out);
 
     }
+
 }

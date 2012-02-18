@@ -4,3 +4,9 @@ Utility to convert shopzilla XML feed to csv format.
 Any element which contains "," or double quote(") will be quoted.
 A double quote is quoted by another double quote.
 We need to extract out inner image elements.
+
+GAE times out the request after 1 min so we can not download more than
+10000 offers in one shot when using GAE hosted application.
+
+Example of a working shopzilla URL:
+"http://catalog.bizrate.com/services/catalog/v1/us/product?apiKey=<apikey>&publisherId=<pubid>&&categoryId=10000000&keyword=&productId=&productIdType=&offersOnly=true&biddedOnly=true&start=0&results=300&sort=relevancy_desc&imageOnly=true&format=xml";

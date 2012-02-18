@@ -15,13 +15,20 @@ import java.util.Hashtable;
 public class ShopzillaURL {
     private String
             host = "http://catalog.bizrate.com/services/catalog/v1/us/taxonomy";
-    private String apiKey= "bfc9253adedf4ad6880d24ee17eb59d6";
-    private String publisherId = "6866";
+    private String apiKey;
+    //= "bfc9253adedf4ad6880d24ee17eb59d6";
+    private String publisherId;
+    //= "6866";
     private String categoryId = "";
     private String fetchCount = "100000";
     private String format = "xml";
 
     private HTTPParams params= new HTTPParams(host, "");
+
+    public ShopzillaURL(String apiKey, String publisherId) {
+        this.apiKey = apiKey;
+        this.publisherId = publisherId;
+    }
 
     String getCategoryQueryURL(String categoryId) {
         this.categoryId = categoryId;

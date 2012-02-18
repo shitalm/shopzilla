@@ -2,17 +2,13 @@ package com.shopzilla.feeds;
 
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
-import java.io.BufferedInputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,6 +25,13 @@ import java.util.logging.Logger;
 public class Taxonomy {
 
     private static final Logger log = Logger.getLogger(Taxonomy.class.getName());
+    private ShopzillaURL url;
+
+    public Taxonomy() {}
+
+    public Taxonomy(ShopzillaURL url) {
+        this.url = url;
+    }
 
     List<Category> getStaticChildCategories(String categoryId) throws Exception {
         String url = "file://taxonomy.xml";
@@ -36,13 +39,14 @@ public class Taxonomy {
     }
 
     List<Category> getChildCategories(String categoryId) throws Exception {
-        return getChildCategories(new ShopzillaURL().getCategoryQueryURL(categoryId), categoryId);
+        return getChildCategories(url.getCategoryQueryURL(categoryId), categoryId);
     }
 
     List<Category> getChildCategories(String url, String categoryId) throws Exception {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         //dbFactory.setNamespaceAware(true);
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        log.fine("Downloading categories using URL: " + url);
         Document doc = dBuilder.parse(Utils.getInputStream(url, true));
         return getChildCategories(doc, categoryId);
 
@@ -69,11 +73,12 @@ public class Taxonomy {
 
     public static void main(String[] args) throws Exception {
         String categoryId = "10000000";
-        Taxonomy taxonomy = new Taxonomy();
+        String apiKey = System.getenv("apiKey");
+        String pubId = System.getenv("publisherId");
+        if(apiKey == null || pubId == null) System.err.println("Please provide api key and publisher id as env properties");
+        Taxonomy taxonomy = new Taxonomy(new ShopzillaURL(apiKey, pubId));
         //String url = "file://taxonomy.xml";
-        String url = new ShopzillaURL().getCategoryQueryURL(categoryId);
-        System.err.println("URL=" + url);
-        List<Category> list = taxonomy.getChildCategories(url, categoryId);
+        List<Category> list = taxonomy.getChildCategories(categoryId);
         System.err.println(Arrays.toString(list.toArray()));
     }
 }
