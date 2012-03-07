@@ -272,15 +272,13 @@ public class ShopzillaFeedConvertor extends DefaultHandler {
      */
 
     private void emitOffer(HashMap<String, String> offer) {
+        int fieldCount = OfferField.getMandatoryFields().size();
+        int index = 1;
         for (OfferField field : OfferField.getMandatoryFields()) {
             //System.out.println("Emitting value for " + field.getFieldName(offerType));
-            emitValue(field.getFieldName(offerType));
+            // don't emit separator for last column
+            emitValue(field.getFieldName(offerType), (index++ != fieldCount));
         }
-        /*
-        for(OfferField field : otherFields) {
-            emitValue(field.getFieldName());
-        }
-        */
 
         writer.println();
 

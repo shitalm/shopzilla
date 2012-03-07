@@ -147,7 +147,7 @@ public class ShopzillaFeedConvertorTest {
 
         String url = "file:///Users/shitalm/Documents/work/greenfield/111products.xml";
         try {
-            out = new FileOutputStream(new File("110-productfeed.csv"));
+            out = new FileOutputStream(new File("temp/110-productfeed.csv"));
             convertor.convert(url, out);
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
